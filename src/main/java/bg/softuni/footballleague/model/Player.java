@@ -1,0 +1,39 @@
+package bg.softuni.footballleague.model;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "players")
+public class Player {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank
+    @Size(max = 100)
+    @Column(nullable = false)
+    private String firstName;
+
+    @NotBlank
+    @Size(max = 100)
+    @Column(nullable = false)
+    private String lastName;
+
+    @Size(max = 50)
+    private String position;
+
+    @Positive
+    private Integer shirtNumber;
+
+    @ManyToOne
+    @JoinColumn(name = "team_id", nullable = false)
+    private Team team;
+}
