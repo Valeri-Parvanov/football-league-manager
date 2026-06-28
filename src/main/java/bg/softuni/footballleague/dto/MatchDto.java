@@ -28,4 +28,8 @@ public class MatchDto {
 
     @NotNull
     private LocalDateTime playedAt;
+
+    private String homeTeamName;
+
+    private String awayTeamName;
 }

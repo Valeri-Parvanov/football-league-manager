@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Matches</title>
+</head>
+<body>
+<h1>Matches</h1>
+
+<p><a th:href="@{/}">Back to home</a></p>
+
+<div sec:authorize="hasRole('ADMIN')">
+    <a th:href="@{/matches/create}">Add new match</a>
+</div>
+
+<table border="1" cellpadding="6">
+    <thead>
+    <tr>
+        <th>Home team</th>
+        <th>Away team</th>
+        <th>Score</th>
+        <th>Played at</th>
+        <th sec:authorize="hasRole('ADMIN')">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="match : ${matches}">
+        <td th:text="${match.homeTeamName}"></td>
+        <td th:text="${match.awayTeamName}"></td>
+        <td th:text="${match.homeScore} + ' : ' + ${match.awayScore}"></td>
+        <td th:text="${match.playedAt}"></td>
+        <td sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/matches/{id}/edit(id=${match.id})}">Edit</a>
+            <form th:action="@{/matches/{id}/delete(id=${match.id})}" method="post" style="display:inline">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

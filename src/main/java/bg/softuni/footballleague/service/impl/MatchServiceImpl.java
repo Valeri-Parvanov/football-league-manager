@@ -2,6 +2,7 @@ package bg.softuni.footballleague.service.impl;
 
 import bg.softuni.footballleague.dto.MatchDto;
 import bg.softuni.footballleague.exception.EntityNotFoundException;
+import bg.softuni.footballleague.exception.InvalidMatchException;
 import bg.softuni.footballleague.model.Match;
 import bg.softuni.footballleague.model.Team;
 import bg.softuni.footballleague.repository.MatchRepository;
@@ -70,6 +71,10 @@ public class MatchServiceImpl implements MatchService {
     }
 
     private void mapToEntity(MatchDto matchDto, Match match) {
+        if (matchDto.getHomeTeamId().equals(matchDto.getAwayTeamId())) {
+            throw new InvalidMatchException("Home team and away team must be different");
+        }
+
         match.setHomeTeam(getTeamOrThrow(matchDto.getHomeTeamId()));
         match.setAwayTeam(getTeamOrThrow(matchDto.getAwayTeamId()));
         match.setHomeScore(matchDto.getHomeScore());
@@ -80,8 +85,14 @@ public class MatchServiceImpl implements MatchService {
     private MatchDto toDto(Match match) {
         MatchDto matchDto = new MatchDto();
         matchDto.setId(match.getId());
-        matchDto.setHomeTeamId(match.getHomeTeam() != null ? match.getHomeTeam().getId() : null);
-        matchDto.setAwayTeamId(match.getAwayTeam() != null ? match.getAwayTeam().getId() : null);
+        if (match.getHomeTeam() != null) {
+            matchDto.setHomeTeamId(match.getHomeTeam().getId());
+            matchDto.setHomeTeamName(match.getHomeTeam().getName());
+        }
+        if (match.getAwayTeam() != null) {
+            matchDto.setAwayTeamId(match.getAwayTeam().getId());
+            matchDto.setAwayTeamName(match.getAwayTeam().getName());
+        }
         matchDto.setHomeScore(match.getHomeScore());
         matchDto.setAwayScore(match.getAwayScore());
         matchDto.setPlayedAt(match.getPlayedAt());
