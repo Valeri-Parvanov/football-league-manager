@@ -81,6 +81,7 @@ public class TeamServiceImpl implements TeamService {
         teamDto.setName(team.getName());
         teamDto.setCity(team.getCity());
         teamDto.setLeagueId(team.getLeague() != null ? team.getLeague().getId() : null);
+        teamDto.setLeagueName(team.getLeague() != null ? team.getLeague().getName() : null);
         return teamDto;
     }
 }

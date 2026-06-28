@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Team form</title>
+</head>
+<body>
+<h1 th:text="${teamDto.id} ? 'Edit team' : 'Add team'"></h1>
+
+<form th:action="${teamDto.id} ? @{/teams/{id}/edit(id=${teamDto.id})} : @{/teams/create}"
+      th:object="${teamDto}" method="post">
+
+    <div>
+        <label for="name">Name</label>
+        <input type="text" id="name" th:field="*{name}"/>
+        <span style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+    </div>
+
+    <div>
+        <label for="city">City</label>
+        <input type="text" id="city" th:field="*{city}"/>
+        <span style="color:red" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></span>
+    </div>
+
+    <div>
+        <label for="leagueId">League</label>
+        <select id="leagueId" th:field="*{leagueId}">
+            <option value="">-- select league --</option>
+            <option th:each="league : ${leagues}" th:value="${league.id}" th:text="${league.name}"></option>
+        </select>
+        <span style="color:red" th:if="${#fields.hasErrors('leagueId')}" th:errors="*{leagueId}"></span>
+    </div>
+
+    <button type="submit">Save</button>
+</form>
+
+<p><a th:href="@{/teams}">Back to teams</a></p>
+</body>
+</html>
