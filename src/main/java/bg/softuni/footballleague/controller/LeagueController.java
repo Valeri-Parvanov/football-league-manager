@@ -1,12 +1,15 @@
 package bg.softuni.footballleague.controller;
 
 import bg.softuni.footballleague.dto.LeagueDto;
+import bg.softuni.footballleague.model.ChangeAction;
+import bg.softuni.footballleague.model.EntityType;
+import bg.softuni.footballleague.service.ChangeRequestService;
 import bg.softuni.footballleague.service.LeagueService;
 import bg.softuni.footballleague.web.SortSupport;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Map;
 import java.util.UUID;
@@ -32,6 +36,7 @@ public class LeagueController {
     );
 
     private final LeagueService leagueService;
+    private final ChangeRequestService changeRequestService;
 
     @GetMapping
     public String list(@RequestParam(required = false) String sort,
@@ -44,47 +49,63 @@ public class LeagueController {
         return "leagues/list";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/create")
-    public String createForm(Model model) {
-        model.addAttribute("leagueDto", new LeagueDto());
+    public String createForm(@RequestParam(required = false) UUID fromRequest, Model model,
+                              Authentication authentication) {
+        LeagueDto leagueDto = fromRequest != null
+                ? (LeagueDto) changeRequestService.getPayloadForResubmit(fromRequest, authentication)
+                : new LeagueDto();
+        model.addAttribute("leagueDto", leagueDto);
         return "leagues/form";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
-    public String create(@Valid @ModelAttribute("leagueDto") LeagueDto leagueDto, BindingResult bindingResult) {
+    public String create(@Valid @ModelAttribute("leagueDto") LeagueDto leagueDto, BindingResult bindingResult,
+                          Authentication authentication, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             return "leagues/form";
         }
 
-        leagueService.create(leagueDto);
+        boolean executed = changeRequestService.submitOrExecute(
+                EntityType.LEAGUE, ChangeAction.CREATE, leagueDto, null, authentication);
+        redirectAttributes.addFlashAttribute("statusMessage",
+                executed ? "League created." : "Submitted for admin approval.");
         return "redirect:/leagues";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable UUID id, Model model) {
-        model.addAttribute("leagueDto", leagueService.findById(id));
+    public String editForm(@PathVariable UUID id, @RequestParam(required = false) UUID fromRequest, Model model,
+                            Authentication authentication) {
+        LeagueDto leagueDto = fromRequest != null
+                ? (LeagueDto) changeRequestService.getPayloadForResubmit(fromRequest, authentication)
+                : leagueService.findById(id);
+        leagueDto.setId(id);
+        model.addAttribute("leagueDto", leagueDto);
         return "leagues/form";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{id}/edit")
     public String edit(@PathVariable UUID id, @Valid @ModelAttribute("leagueDto") LeagueDto leagueDto,
-                        BindingResult bindingResult) {
+                        BindingResult bindingResult, Authentication authentication,
+                        RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             return "leagues/form";
         }
 
-        leagueService.update(id, leagueDto);
+        boolean executed = changeRequestService.submitOrExecute(
+                EntityType.LEAGUE, ChangeAction.UPDATE, leagueDto, id, authentication);
+        redirectAttributes.addFlashAttribute("statusMessage",
+                executed ? "League updated." : "Submitted for admin approval.");
         return "redirect:/leagues";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{id}/delete")
-    public String delete(@PathVariable UUID id) {
-        leagueService.delete(id);
+    public String delete(@PathVariable UUID id, Authentication authentication,
+                          RedirectAttributes redirectAttributes) {
+        boolean executed = changeRequestService.submitOrExecute(
+                EntityType.LEAGUE, ChangeAction.DELETE, null, id, authentication);
+        redirectAttributes.addFlashAttribute("statusMessage",
+                executed ? "League deleted." : "Submitted for admin approval.");
         return "redirect:/leagues";
     }
 }

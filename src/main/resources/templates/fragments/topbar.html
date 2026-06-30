@@ -10,6 +10,8 @@
         <a th:href="@{/teams}">&#128737; Teams</a>
         <a th:href="@{/players}">&#129489; Players</a>
         <a th:href="@{/matches}">&#9917; Matches</a>
+        <a th:href="@{/admin/change-requests}" sec:authorize="hasRole('ADMIN')">&#128203; Pending changes</a>
+        <a th:href="@{/my-proposals}" sec:authorize="isAuthenticated() and !hasRole('ADMIN')">&#128221; My proposals</a>
     </nav>
 
     <div class="auth-box" sec:authorize="isAnonymous()">

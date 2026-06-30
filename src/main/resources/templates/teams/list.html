@@ -15,8 +15,9 @@
 <main class="page">
 <h1>&#128737; Teams</h1>
 
+<p th:if="${statusMessage}" th:text="${statusMessage}" class="status-message"></p>
 
-<div sec:authorize="hasRole('ADMIN')">
+<div sec:authorize="isAuthenticated()">
     <a th:href="@{/teams/create}">Add new team</a>
 </div>
 
@@ -26,7 +27,7 @@
         <th th:replace="~{fragments/sortable :: sortTh('/teams', 'name', 'Name')}"></th>
         <th th:replace="~{fragments/sortable :: sortTh('/teams', 'city', 'City')}"></th>
         <th th:replace="~{fragments/sortable :: sortTh('/teams', 'league', 'League')}"></th>
-        <th sec:authorize="hasRole('ADMIN')">Actions</th>
+        <th sec:authorize="isAuthenticated()">Actions</th>
     </tr>
     </thead>
     <tbody>
@@ -34,7 +35,7 @@
         <td th:text="${team.name}"></td>
         <td th:text="${team.city}"></td>
         <td th:text="${team.leagueName}"></td>
-        <td sec:authorize="hasRole('ADMIN')">
+        <td sec:authorize="isAuthenticated()">
             <a th:href="@{/teams/{id}/edit(id=${team.id})}">Edit</a>
             <form th:action="@{/teams/{id}/delete(id=${team.id})}" method="post" style="display:inline">
                 <button type="submit">Delete</button>

@@ -2,13 +2,16 @@ package bg.softuni.footballleague.controller;
 
 import bg.softuni.footballleague.dto.MatchDto;
 import bg.softuni.footballleague.dto.TeamDto;
+import bg.softuni.footballleague.model.ChangeAction;
+import bg.softuni.footballleague.model.EntityType;
+import bg.softuni.footballleague.service.ChangeRequestService;
 import bg.softuni.footballleague.service.MatchService;
 import bg.softuni.footballleague.service.TeamService;
 import bg.softuni.footballleague.web.SortSupport;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Map;
 import java.util.UUID;
@@ -38,6 +42,7 @@ public class MatchController {
 
     private final MatchService matchService;
     private final TeamService teamService;
+    private final ChangeRequestService changeRequestService;
 
     @GetMapping
     public String list(@RequestParam(required = false) String sort,
@@ -50,54 +55,69 @@ public class MatchController {
         return "matches/list";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/create")
-    public String createForm(Model model) {
-        model.addAttribute("matchDto", new MatchDto());
+    public String createForm(@RequestParam(required = false) UUID fromRequest, Model model,
+                              Authentication authentication) {
+        MatchDto matchDto = fromRequest != null
+                ? (MatchDto) changeRequestService.getPayloadForResubmit(fromRequest, authentication)
+                : new MatchDto();
+        model.addAttribute("matchDto", matchDto);
         model.addAttribute("teams", teamService.findAll());
         return "matches/form";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public String create(@Valid @ModelAttribute("matchDto") MatchDto matchDto, BindingResult bindingResult,
-                          Model model) {
+                          Model model, Authentication authentication, RedirectAttributes redirectAttributes) {
         validateTeams(matchDto, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("teams", teamService.findAll());
             return "matches/form";
         }
 
-        matchService.create(matchDto);
+        boolean executed = changeRequestService.submitOrExecute(
+                EntityType.MATCH, ChangeAction.CREATE, matchDto, null, authentication);
+        redirectAttributes.addFlashAttribute("statusMessage",
+                executed ? "Match created." : "Submitted for admin approval.");
         return "redirect:/matches";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable UUID id, Model model) {
-        model.addAttribute("matchDto", matchService.findById(id));
+    public String editForm(@PathVariable UUID id, @RequestParam(required = false) UUID fromRequest, Model model,
+                            Authentication authentication) {
+        MatchDto matchDto = fromRequest != null
+                ? (MatchDto) changeRequestService.getPayloadForResubmit(fromRequest, authentication)
+                : matchService.findById(id);
+        matchDto.setId(id);
+        model.addAttribute("matchDto", matchDto);
         model.addAttribute("teams", teamService.findAll());
         return "matches/form";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{id}/edit")
     public String edit(@PathVariable UUID id, @Valid @ModelAttribute("matchDto") MatchDto matchDto,
-                        BindingResult bindingResult, Model model) {
+                        BindingResult bindingResult, Model model, Authentication authentication,
+                        RedirectAttributes redirectAttributes) {
         validateTeams(matchDto, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("teams", teamService.findAll());
             return "matches/form";
         }
 
-        matchService.update(id, matchDto);
+        boolean executed = changeRequestService.submitOrExecute(
+                EntityType.MATCH, ChangeAction.UPDATE, matchDto, id, authentication);
+        redirectAttributes.addFlashAttribute("statusMessage",
+                executed ? "Match updated." : "Submitted for admin approval.");
         return "redirect:/matches";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{id}/delete")
-    public String delete(@PathVariable UUID id) {
-        matchService.delete(id);
+    public String delete(@PathVariable UUID id, Authentication authentication,
+                          RedirectAttributes redirectAttributes) {
+        boolean executed = changeRequestService.submitOrExecute(
+                EntityType.MATCH, ChangeAction.DELETE, null, id, authentication);
+        redirectAttributes.addFlashAttribute("statusMessage",
+                executed ? "Match deleted." : "Submitted for admin approval.");
         return "redirect:/matches";
     }
 
