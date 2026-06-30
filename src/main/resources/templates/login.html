@@ -1,10 +1,15 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Login - Football League Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
+<main class="page">
 <h1>Login</h1>
 
 <p style="color:red" th:if="${param.error}">Invalid username or password</p>
@@ -22,5 +27,6 @@
 </form>
 
 <p>Don't have an account? <a th:href="@{/register}">Register</a></p>
+</main>
 </body>
 </html>

@@ -1,0 +1,425 @@
+:root {
+    --bg-deep: #06140d;
+    --bg-mid: #0c2a1a;
+    --pitch: #16a34a;
+    --pitch-bright: #22c55e;
+    --gold: #fbbf24;
+    --gold-bright: #fde047;
+    --glass: rgba(255, 255, 255, 0.06);
+    --glass-border: rgba(255, 255, 255, 0.14);
+    --ink: #0b1f14;
+    --paper: #f7fdf9;
+    --muted: #9fb8aa;
+    --danger: #f43f5e;
+    --danger-dark: #be123c;
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Inter", "Segoe UI", sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    color: var(--paper);
+    background-color: #07260f;
+    background-image:
+        /* cool stadium floodlight glow, top corners only */
+        radial-gradient(circle at 4% 0%, rgba(214, 234, 255, 0.16), transparent 26%),
+        radial-gradient(circle at 96% 0%, rgba(214, 234, 255, 0.13), transparent 26%),
+        /* vignette for depth/realism */
+        radial-gradient(ellipse 90% 70% at 50% 28%, transparent 45%, rgba(0, 0, 0, 0.55) 100%),
+        /* full pitch line markings (halfway line, center circle, penalty boxes, arcs, corners) */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 1000'%3E%3Cg fill='none' stroke='white' stroke-opacity='0.16' stroke-width='3'%3E%3Crect x='40' y='40' width='520' height='920'/%3E%3Cline x1='40' y1='500' x2='560' y2='500'/%3E%3Ccircle cx='300' cy='500' r='95'/%3E%3Ccircle cx='300' cy='500' r='4' fill='white' fill-opacity='0.16' stroke='none'/%3E%3Crect x='170' y='40' width='260' height='160'/%3E%3Crect x='240' y='40' width='120' height='60'/%3E%3Cpath d='M 215 200 A 95 95 0 0 1 385 200'/%3E%3Ccircle cx='300' cy='150' r='3.5' fill='white' fill-opacity='0.16' stroke='none'/%3E%3Crect x='170' y='800' width='260' height='160'/%3E%3Crect x='240' y='900' width='120' height='60'/%3E%3Cpath d='M 385 800 A 95 95 0 0 1 215 800'/%3E%3Ccircle cx='300' cy='850' r='3.5' fill='white' fill-opacity='0.16' stroke='none'/%3E%3Cpath d='M 40 60 A 20 20 0 0 1 60 40'/%3E%3Cpath d='M 540 40 A 20 20 0 0 1 560 60'/%3E%3Cpath d='M 560 940 A 20 20 0 0 1 540 960'/%3E%3Cpath d='M 60 960 A 20 20 0 0 1 40 940'/%3E%3C/g%3E%3C/svg%3E"),
+        /* mowed-grass stripes */
+        repeating-linear-gradient(
+            0deg,
+            rgba(255, 255, 255, 0.045) 0,
+            rgba(255, 255, 255, 0.045) 70px,
+            rgba(0, 0, 0, 0.08) 70px,
+            rgba(0, 0, 0, 0.08) 140px
+        ),
+        linear-gradient(180deg, #031a0c 0%, #0a3d1d 16%, #0f5c2c 45%, #0e4f26 70%, #052712 100%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+    background-position: top left, top right, center, center top, top, top;
+    padding-bottom: 4rem;
+    position: relative;
+}
+
+/* stadium stands silhouette along the very top, fading into the pitch */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    z-index: 1;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+        90deg,
+        rgba(4, 10, 7, 0.92) 0,
+        rgba(4, 10, 7, 0.92) 5px,
+        rgba(22, 32, 26, 0.92) 5px,
+        rgba(22, 32, 26, 0.92) 10px
+    );
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+}
+
+/* a faint, darkened decorative ball, purely cosmetic */
+body::after {
+    content: "\26BD";
+    position: fixed;
+    bottom: -40px;
+    right: -20px;
+    font-size: 16rem;
+    opacity: 0.13;
+    filter: grayscale(0.4) brightness(0.55);
+    z-index: 0;
+    pointer-events: none;
+}
+
+h1, h2, h3 {
+    font-family: "Poppins", "Inter", sans-serif;
+}
+
+/* ---------- Top bar ---------- */
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(3, 14, 8, 0.8);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 1rem 2.2rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.brand {
+    font-family: "Poppins", sans-serif;
+    color: var(--paper);
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.brand .ball {
+    font-size: 1.6rem;
+    filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.6));
+}
+
+.auth-box {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    color: var(--paper);
+}
+
+.auth-box form {
+    box-shadow: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    max-width: none;
+    border: none;
+}
+
+.auth-box .welcome {
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.auth-box .welcome span {
+    color: var(--gold-bright);
+}
+
+/* ---------- Links & buttons ---------- */
+
+a {
+    color: var(--pitch-bright);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+a:hover {
+    color: var(--gold-bright);
+}
+
+.topbar a,
+.auth-box a {
+    color: var(--paper);
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 1.4rem;
+}
+
+.back-link:hover {
+    color: var(--gold-bright);
+}
+
+button,
+.btn {
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+    color: var(--ink);
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(251, 191, 36, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:hover,
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 26px rgba(251, 191, 36, 0.5);
+    color: var(--ink);
+}
+
+td form button,
+table form button {
+    background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+    color: var(--paper);
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    box-shadow: 0 4px 14px rgba(244, 63, 94, 0.35);
+}
+
+td form button:hover {
+    box-shadow: 0 8px 20px rgba(244, 63, 94, 0.5);
+}
+
+/* ---------- Page card ---------- */
+
+.page {
+    position: relative;
+    z-index: 2;
+    max-width: 1040px;
+    margin: 2.5rem auto 0;
+    background: #fdfefd;
+    color: var(--ink);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.22);
+    padding: 2.2rem 2.5rem;
+    animation: rise 0.4s ease;
+}
+
+@keyframes rise {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page h1 {
+    margin-top: 0;
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: var(--bg-mid);
+    display: inline-block;
+}
+
+.page h1::after {
+    content: "";
+    display: block;
+    width: 48px;
+    height: 4px;
+    margin-top: 0.4rem;
+    border-radius: 999px;
+    background: var(--gold);
+}
+
+/* ---------- Nav pills ---------- */
+
+nav {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+nav a {
+    background: var(--glass);
+    color: var(--paper);
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    border: 1px solid var(--glass-border);
+    transition: background 0.15s ease, transform 0.15s ease, color 0.15s ease;
+}
+
+nav a:hover {
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+    color: var(--ink);
+    transform: translateY(-1px);
+}
+
+/* ---------- Admin add-new link ---------- */
+
+.page > div[sec\:authorize] {
+    margin-bottom: 1.4rem;
+}
+
+.page > div[sec\:authorize] > a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: linear-gradient(135deg, var(--pitch-bright), var(--pitch));
+    color: var(--paper);
+    padding: 0.55rem 1.3rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    box-shadow: 0 6px 18px rgba(22, 163, 74, 0.35);
+}
+
+.page > div[sec\:authorize] > a::before {
+    content: "+";
+    font-weight: 800;
+}
+
+.page > div[sec\:authorize] > a:hover {
+    color: var(--ink);
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+}
+
+/* ---------- Tables (card-row style) ---------- */
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.55rem;
+}
+
+thead {
+    display: table-header-group;
+}
+
+th {
+    background: transparent;
+    color: var(--muted);
+    text-align: left;
+    padding: 0 1.1rem 0.4rem;
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    border: none;
+}
+
+tbody tr {
+    background: #f0f7f2;
+    box-shadow: 0 2px 6px rgba(11, 31, 20, 0.06);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+
+tbody tr:hover {
+    background: #e3f3e8;
+    transform: translateX(3px);
+    box-shadow: 0 6px 16px rgba(22, 163, 74, 0.18);
+}
+
+td {
+    padding: 0.85rem 1.1rem;
+    border: none;
+}
+
+td:first-child {
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    font-weight: 600;
+}
+
+td:last-child {
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+td a {
+    color: var(--pitch);
+    margin-right: 0.6rem;
+    font-size: 0.88rem;
+}
+
+/* ---------- Forms ---------- */
+
+form {
+    max-width: 460px;
+    background: linear-gradient(180deg, #ffffff, #f3faf5);
+    padding: 1.8rem 2rem;
+    border-radius: var(--radius-md);
+    border: 1px solid #dcefe1;
+    box-shadow: 0 16px 40px rgba(11, 31, 20, 0.12);
+}
+
+form div {
+    margin-bottom: 1.2rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: 700;
+    color: var(--bg-mid);
+    font-size: 0.86rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 0.65rem 0.8rem;
+    border: 1.5px solid #d6e9dc;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: #fff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--pitch);
+    box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15);
+}
+
+span[style*="color:red"],
+span[style*="color: red"] {
+    display: block;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+    font-weight: 600;
+    color: var(--danger-dark) !important;
+}
+
+/* ---------- Error page ---------- */
+
+.page p {
+    color: var(--muted-ink, #3a4f44);
+}
