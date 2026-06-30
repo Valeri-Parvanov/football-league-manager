@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<header th:fragment="topbar" class="topbar">
+    <a th:href="@{/}" class="brand"><span class="ball">&#9917;</span>Football League Manager</a>
+
+    <nav>
+        <a th:href="@{/leagues}">&#127942; Leagues</a>
+        <a th:href="@{/teams}">&#128737; Teams</a>
+        <a th:href="@{/players}">&#129489; Players</a>
+        <a th:href="@{/matches}">&#9917; Matches</a>
+    </nav>
+
+    <div class="auth-box" sec:authorize="isAnonymous()">
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/register}">Register</a>
+    </div>
+
+    <div class="auth-box" sec:authorize="isAuthenticated()">
+        <span class="welcome">Welcome, <span sec:authentication="name"></span>!</span>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+</header>
+</body>
+</html>

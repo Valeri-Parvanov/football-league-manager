@@ -9,11 +9,13 @@
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
+<div th:replace="~{fragments/topbar :: topbar}"></div>
+
 <main class="page">
 <h1 th:text="${leagueDto.id} ? 'Edit league' : 'Add league'"></h1>
 
 <form th:action="${leagueDto.id} ? @{/leagues/{id}/edit(id=${leagueDto.id})} : @{/leagues/create}"
-      th:object="${leagueDto}" method="post">
+      th:object="${leagueDto}" method="post" class="card-form">
 
     <div>
         <label for="name">Name</label>

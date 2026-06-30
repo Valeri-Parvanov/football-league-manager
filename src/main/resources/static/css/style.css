@@ -124,6 +124,12 @@ h1, h2, h3 {
     filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.6));
 }
 
+.brand,
+.brand:hover {
+    text-decoration: none;
+    color: var(--paper);
+}
+
 .auth-box {
     display: flex;
     align-items: center;
@@ -367,7 +373,7 @@ td a {
 
 /* ---------- Forms ---------- */
 
-form {
+.card-form {
     max-width: 460px;
     background: linear-gradient(180deg, #ffffff, #f3faf5);
     padding: 1.8rem 2rem;
@@ -376,7 +382,7 @@ form {
     box-shadow: 0 16px 40px rgba(11, 31, 20, 0.12);
 }
 
-form div {
+.card-form div {
     margin-bottom: 1.2rem;
 }
 
