@@ -14,14 +14,14 @@ public class TeamDto {
 
     private UUID id;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Team name is required")
+    @Size(max = 100, message = "Team name must be at most 100 characters")
     private String name;
 
-    @Size(max = 100)
+    @Size(max = 100, message = "City must be at most 100 characters")
     private String city;
 
-    @NotNull
+    @NotNull(message = "Please select a league")
     private UUID leagueId;
 
     private String leagueName;

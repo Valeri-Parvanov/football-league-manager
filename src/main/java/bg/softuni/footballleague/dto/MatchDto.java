@@ -14,19 +14,19 @@ public class MatchDto {
 
     private UUID id;
 
-    @NotNull
+    @NotNull(message = "Please select a home team")
     private UUID homeTeamId;
 
-    @NotNull
+    @NotNull(message = "Please select an away team")
     private UUID awayTeamId;
 
-    @PositiveOrZero
+    @PositiveOrZero(message = "Home score cannot be negative")
     private Integer homeScore;
 
-    @PositiveOrZero
+    @PositiveOrZero(message = "Away score cannot be negative")
     private Integer awayScore;
 
-    @NotNull
+    @NotNull(message = "Please select a date and time")
     private LocalDateTime playedAt;
 
     private String homeTeamName;

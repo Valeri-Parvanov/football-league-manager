@@ -1,6 +1,7 @@
 package bg.softuni.footballleague.controller;
 
 import bg.softuni.footballleague.dto.MatchDto;
+import bg.softuni.footballleague.dto.TeamDto;
 import bg.softuni.footballleague.service.MatchService;
 import bg.softuni.footballleague.service.TeamService;
 import jakarta.validation.Valid;
@@ -43,9 +44,7 @@ public class MatchController {
     @PostMapping("/create")
     public String create(@Valid @ModelAttribute("matchDto") MatchDto matchDto, BindingResult bindingResult,
                           Model model) {
-        if (matchDto.getHomeTeamId() != null && matchDto.getHomeTeamId().equals(matchDto.getAwayTeamId())) {
-            bindingResult.rejectValue("awayTeamId", "team.same", "Away team must differ from home team");
-        }
+        validateTeams(matchDto, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("teams", teamService.findAll());
             return "matches/form";
@@ -67,9 +66,7 @@ public class MatchController {
     @PostMapping("/{id}/edit")
     public String edit(@PathVariable UUID id, @Valid @ModelAttribute("matchDto") MatchDto matchDto,
                         BindingResult bindingResult, Model model) {
-        if (matchDto.getHomeTeamId() != null && matchDto.getHomeTeamId().equals(matchDto.getAwayTeamId())) {
-            bindingResult.rejectValue("awayTeamId", "team.same", "Away team must differ from home team");
-        }
+        validateTeams(matchDto, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("teams", teamService.findAll());
             return "matches/form";
@@ -84,5 +81,21 @@ public class MatchController {
     public String delete(@PathVariable UUID id) {
         matchService.delete(id);
         return "redirect:/matches";
+    }
+
+    private void validateTeams(MatchDto matchDto, BindingResult bindingResult) {
+        if (matchDto.getHomeTeamId() == null || matchDto.getAwayTeamId() == null) {
+            return;
+        }
+        if (matchDto.getHomeTeamId().equals(matchDto.getAwayTeamId())) {
+            bindingResult.rejectValue("awayTeamId", "team.same", "Away team must differ from home team");
+            return;
+        }
+
+        TeamDto homeTeam = teamService.findById(matchDto.getHomeTeamId());
+        TeamDto awayTeam = teamService.findById(matchDto.getAwayTeamId());
+        if (!homeTeam.getLeagueId().equals(awayTeam.getLeagueId())) {
+            bindingResult.rejectValue("awayTeamId", "team.differentLeague", "Both teams must be in the same league");
+        }
     }
 }

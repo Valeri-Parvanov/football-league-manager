@@ -16,19 +16,20 @@ public class PlayerDto {
 
     private UUID id;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "First name is required")
+    @Size(max = 100, message = "First name must be at most 100 characters")
     private String firstName;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Last name is required")
+    @Size(max = 100, message = "Last name must be at most 100 characters")
     private String lastName;
 
-    @Positive
-    @Max(99)
+    @NotNull(message = "Shirt number is required")
+    @Positive(message = "Shirt number must be greater than 0")
+    @Max(value = 99, message = "Shirt number must be at most 99")
     private Integer shirtNumber;
 
-    @NotNull
+    @NotNull(message = "Please select a team")
     private UUID teamId;
 
     private String teamName;
