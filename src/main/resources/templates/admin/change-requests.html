@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Pending changes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/topbar :: topbar}"></div>
+
+<main class="page">
+<h1>&#128203; Pending changes</h1>
+
+<p th:if="${statusMessage}" th:text="${statusMessage}" class="status-message"></p>
+<p th:if="${errorMessage}" th:text="${errorMessage}" class="error-message"></p>
+
+<p th:if="${#lists.isEmpty(changeRequests)}">No pending changes.</p>
+
+<div class="cr-list" th:unless="${#lists.isEmpty(changeRequests)}">
+    <div class="cr-card" th:each="cr : ${changeRequests}">
+        <div class="cr-card-header">
+            <span class="badge badge-entity">
+                <span th:switch="${cr.entityType.name()}">
+                    <span th:case="'LEAGUE'">&#127942; League</span>
+                    <span th:case="'TEAM'">&#128737; Team</span>
+                    <span th:case="'PLAYER'">&#129489; Player</span>
+                    <span th:case="'MATCH'">&#9917; Match</span>
+                </span>
+            </span>
+            <span class="badge"
+                  th:classappend="${cr.action.name() == 'CREATE'} ? 'badge-create' : (${cr.action.name() == 'UPDATE'} ? 'badge-update' : 'badge-delete')"
+                  th:text="${cr.action}"></span>
+            <span class="cr-meta">
+                Requested by <strong th:text="${cr.requestedByUsername}"></strong>
+                on <span th:text="${#temporals.format(cr.requestedAt, 'dd MMM yyyy, HH:mm')}"></span>
+            </span>
+        </div>
+
+        <ul class="cr-details">
+            <li th:each="line : ${cr.details}" th:text="${line}"></li>
+        </ul>
+
+        <div class="cr-actions">
+            <form th:action="@{/admin/change-requests/{id}/approve(id=${cr.id})}" method="post" style="display:inline">
+                <button type="submit" class="btn-approve">Approve</button>
+            </form>
+            <form th:action="@{/admin/change-requests/{id}/reject(id=${cr.id})}" method="post" class="cr-reject-form">
+                <input type="text" name="reason" placeholder="Reason (optional)" class="cr-reason-input"
+                       th:value="${failedRequestId != null and failedRequestId == cr.id} ? ${suggestedReason} : null"
+                       th:attr="list=${'reasons-' + cr.id}"/>
+                <datalist th:id="${'reasons-' + cr.id}" th:switch="${cr.entityType.name()}">
+                    <th:block th:case="'LEAGUE'">
+                        <option value="League name already exists"></option>
+                        <option value="Invalid or unrecognized country"></option>
+                    </th:block>
+                    <th:block th:case="'TEAM'">
+                        <option value="Team name already exists in this league"></option>
+                        <option value="Team belongs to the wrong league"></option>
+                        <option value="City name is invalid or unverifiable"></option>
+                    </th:block>
+                    <th:block th:case="'PLAYER'">
+                        <option value="Shirt number already taken in this team"></option>
+                        <option value="Squad already has 12 players"></option>
+                        <option value="Player name looks fake or invalid"></option>
+                    </th:block>
+                    <th:block th:case="'MATCH'">
+                        <option value="Home and away team must differ"></option>
+                        <option value="Teams must be in the same league"></option>
+                        <option value="Match date/time is invalid"></option>
+                    </th:block>
+                </datalist>
+                <button type="submit" class="btn-reject">Reject</button>
+            </form>
+        </div>
+    </div>
+</div>
+</main>
+</body>
+</html>
