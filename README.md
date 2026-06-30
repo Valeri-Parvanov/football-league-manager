@@ -31,9 +31,11 @@ Technical entities (not counted as domain entities): **User**, **Role** — used
 - Session-based login/registration with BCrypt-hashed passwords.
 - Access control:
   - **Guests** — can only access the home page, register and login pages.
-  - **Logged-in users** — can browse leagues, teams, players and matches.
-  - **Admins** — can additionally create, edit and delete leagues, teams, players and matches
-    (`@PreAuthorize("hasRole('ADMIN')")` on controller mutation endpoints).
+  - **Logged-in users** — can browse leagues, teams, players and matches, and submit create/edit/delete
+    proposals for them (see [Change Approval Workflow](#change-approval-workflow) below).
+  - **Admins** — create/edit/delete actions apply immediately, and admins additionally review,
+    approve or reject proposals submitted by regular users
+    (`@PreAuthorize("hasRole('ADMIN')")` on the admin review endpoints).
 - The first user to register is automatically assigned the `ADMIN` role.
 
 ## Functionalities
@@ -45,6 +47,26 @@ Technical entities (not counted as domain entities): **User**, **Role** — used
 
 Each functionality is triggered through a form/button in the UI, invokes a backend endpoint, and
 shows a visible result (redirect to the updated list).
+
+## Change Approval Workflow
+
+Regular (non-admin) users don't write directly to the database. When a logged-in `USER` submits a
+create, edit or delete action on a League, Team, Player or Match, the request is stored as a
+**pending `ChangeRequest`** instead of being applied immediately. Admins act on these from a
+dedicated **"Pending changes"** page:
+
+- **Approve** — re-runs the same validation and business rules as a direct admin action (so a
+  proposal that has gone stale, e.g. a shirt number taken by someone else in the meantime, fails
+  gracefully with an inline error and stays pending rather than crashing or silently corrupting
+  data), then applies the change for real.
+- **Reject** — discards the proposal with an optional reason (the admin can pick from
+  domain-specific suggested reasons or type a custom one).
+
+Users can track their own submissions, including rejection reasons, on a **"My proposals"** page,
+and resubmit a corrected version of a rejected create/edit proposal with one click (the form is
+pre-filled with their original input).
+
+Admin actions are unaffected by this workflow — they still apply immediately, exactly as before.
 
 ## Validation & Error Handling
 
