@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>My proposals</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/topbar :: topbar}"></div>
+
+<main class="page">
+<h1>&#128221; My proposals</h1>
+
+<p th:if="${#lists.isEmpty(changeRequests)}">You haven't proposed any changes yet.</p>
+
+<div class="cr-list" th:unless="${#lists.isEmpty(changeRequests)}">
+    <div class="cr-card" th:each="cr : ${changeRequests}">
+        <div class="cr-card-header">
+            <span class="badge badge-entity">
+                <span th:switch="${cr.entityType.name()}">
+                    <span th:case="'LEAGUE'">&#127942; League</span>
+                    <span th:case="'TEAM'">&#128737; Team</span>
+                    <span th:case="'PLAYER'">&#129489; Player</span>
+                    <span th:case="'MATCH'">&#9917; Match</span>
+                </span>
+            </span>
+            <span class="badge"
+                  th:classappend="${cr.action.name() == 'CREATE'} ? 'badge-create' : (${cr.action.name() == 'UPDATE'} ? 'badge-update' : 'badge-delete')"
+                  th:text="${cr.action}"></span>
+            <span class="badge"
+                  th:classappend="${cr.status.name() == 'APPROVED'} ? 'badge-create' : (${cr.status.name() == 'PENDING'} ? 'badge-update' : 'badge-delete')"
+                  th:text="${cr.status}"></span>
+            <span class="cr-meta">
+                Submitted on <span th:text="${#temporals.format(cr.requestedAt, 'dd MMM yyyy, HH:mm')}"></span>
+            </span>
+        </div>
+
+        <ul class="cr-details">
+            <li th:each="line : ${cr.details}" th:text="${line}"></li>
+        </ul>
+
+        <p th:if="${cr.status.name() == 'REJECTED' and cr.rejectionReason != null and !cr.rejectionReason.isBlank()}"
+           class="error-message">
+            Reason: <span th:text="${cr.rejectionReason}"></span>
+        </p>
+
+        <div class="cr-actions" th:if="${cr.status.name() == 'REJECTED' and cr.action.name() != 'DELETE'}">
+            <span th:if="${cr.action.name() == 'CREATE'}" th:switch="${cr.entityType.name()}">
+                <a th:case="'LEAGUE'" th:href="@{/leagues/create(fromRequest=${cr.id})}" class="btn-approve">Resubmit</a>
+                <a th:case="'TEAM'" th:href="@{/teams/create(fromRequest=${cr.id})}" class="btn-approve">Resubmit</a>
+                <a th:case="'PLAYER'" th:href="@{/players/create(fromRequest=${cr.id})}" class="btn-approve">Resubmit</a>
+                <a th:case="'MATCH'" th:href="@{/matches/create(fromRequest=${cr.id})}" class="btn-approve">Resubmit</a>
+            </span>
+            <span th:if="${cr.action.name() == 'UPDATE'}" th:switch="${cr.entityType.name()}">
+                <a th:case="'LEAGUE'" th:href="@{/leagues/{id}/edit(id=${cr.targetId},fromRequest=${cr.id})}" class="btn-approve">Resubmit</a>
+                <a th:case="'TEAM'" th:href="@{/teams/{id}/edit(id=${cr.targetId},fromRequest=${cr.id})}" class="btn-approve">Resubmit</a>
+                <a th:case="'PLAYER'" th:href="@{/players/{id}/edit(id=${cr.targetId},fromRequest=${cr.id})}" class="btn-approve">Resubmit</a>
+                <a th:case="'MATCH'" th:href="@{/matches/{id}/edit(id=${cr.targetId},fromRequest=${cr.id})}" class="btn-approve">Resubmit</a>
+            </span>
+        </div>
+    </div>
+</div>
+</main>
+</body>
+</html>
