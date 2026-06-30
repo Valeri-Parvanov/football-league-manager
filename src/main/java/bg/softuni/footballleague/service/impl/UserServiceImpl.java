@@ -1,6 +1,7 @@
 package bg.softuni.footballleague.service.impl;
 
 import bg.softuni.footballleague.dto.RegisterDto;
+import bg.softuni.footballleague.exception.EntityNotFoundException;
 import bg.softuni.footballleague.exception.UsernameAlreadyExistsException;
 import bg.softuni.footballleague.model.Role;
 import bg.softuni.footballleague.model.User;
@@ -30,5 +31,11 @@ public class UserServiceImpl implements UserService {
         user.setRole(userRepository.count() == 0 ? Role.ADMIN : Role.USER);
 
         userRepository.save(user);
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User %s not found".formatted(username)));
     }
 }

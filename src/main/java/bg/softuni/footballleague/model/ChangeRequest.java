@@ -55,4 +55,7 @@ public class ChangeRequest {
     private User reviewedBy;
 
     private LocalDateTime reviewedAt;
+
+    @Column(columnDefinition = "TEXT")
+    private String rejectionReason;
 }
