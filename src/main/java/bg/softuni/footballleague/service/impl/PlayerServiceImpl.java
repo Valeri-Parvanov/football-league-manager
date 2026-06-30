@@ -72,7 +72,6 @@ public class PlayerServiceImpl implements PlayerService {
     private void mapToEntity(PlayerDto playerDto, Player player) {
         player.setFirstName(playerDto.getFirstName());
         player.setLastName(playerDto.getLastName());
-        player.setPosition(playerDto.getPosition());
         player.setShirtNumber(playerDto.getShirtNumber());
         player.setTeam(getTeamOrThrow(playerDto.getTeamId()));
     }
@@ -82,7 +81,6 @@ public class PlayerServiceImpl implements PlayerService {
         playerDto.setId(player.getId());
         playerDto.setFirstName(player.getFirstName());
         playerDto.setLastName(player.getLastName());
-        playerDto.setPosition(player.getPosition());
         playerDto.setShirtNumber(player.getShirtNumber());
         if (player.getTeam() != null) {
             playerDto.setTeamId(player.getTeam().getId());

@@ -23,9 +23,6 @@ public class PlayerDto {
     @Size(max = 100)
     private String lastName;
 
-    @Size(max = 50)
-    private String position;
-
     @Positive
     private Integer shirtNumber;
 

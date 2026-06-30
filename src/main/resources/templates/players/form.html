@@ -28,12 +28,6 @@
     </div>
 
     <div>
-        <label for="position">Position</label>
-        <input type="text" id="position" th:field="*{position}"/>
-        <span style="color:red" th:if="${#fields.hasErrors('position')}" th:errors="*{position}"></span>
-    </div>
-
-    <div>
         <label for="shirtNumber">Shirt number</label>
         <input type="number" id="shirtNumber" th:field="*{shirtNumber}"/>
         <span style="color:red" th:if="${#fields.hasErrors('shirtNumber')}" th:errors="*{shirtNumber}"></span>
