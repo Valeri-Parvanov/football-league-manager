@@ -19,13 +19,19 @@
 
     <div>
         <label for="name">Name</label>
-        <input type="text" id="name" th:field="*{name}"/>
+        <div class="input-row">
+            <input type="text" id="name" th:field="*{name}"/>
+            <button type="button" class="dice-btn" onclick="fillRandomTeamName('name')" title="Generate random name">&#127922;</button>
+        </div>
         <span style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
     </div>
 
     <div>
         <label for="city">City</label>
-        <input type="text" id="city" th:field="*{city}"/>
+        <div class="input-row">
+            <input type="text" id="city" th:field="*{city}"/>
+            <button type="button" class="dice-btn" onclick="fillRandomCity('city')" title="Generate random city">&#127922;</button>
+        </div>
         <span style="color:red" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></span>
     </div>
 
@@ -43,5 +49,6 @@
 
 <p><a th:href="@{/teams}" class="back-link">&#8592; Back to teams</a></p>
 </main>
+<script th:src="@{/js/random-names.js}"></script>
 </body>
 </html>

@@ -415,6 +415,23 @@ select:focus {
     box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15);
 }
 
+.input-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.input-row input {
+    flex: 1;
+}
+
+.dice-btn {
+    flex-shrink: 0;
+    padding: 0.55rem 0.7rem;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
 span[style*="color:red"],
 span[style*="color: red"] {
     display: block;

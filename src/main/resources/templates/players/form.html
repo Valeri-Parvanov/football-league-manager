@@ -19,7 +19,10 @@
 
     <div>
         <label for="firstName">First name</label>
-        <input type="text" id="firstName" th:field="*{firstName}"/>
+        <div class="input-row">
+            <input type="text" id="firstName" th:field="*{firstName}"/>
+            <button type="button" class="dice-btn" onclick="fillRandomPlayerName('firstName', 'lastName')" title="Generate random name">&#127922;</button>
+        </div>
         <span style="color:red" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
     </div>
 
@@ -49,5 +52,6 @@
 
 <p><a th:href="@{/players}" class="back-link">&#8592; Back to players</a></p>
 </main>
+<script th:src="@{/js/random-names.js}"></script>
 </body>
 </html>
