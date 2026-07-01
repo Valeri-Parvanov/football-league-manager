@@ -43,7 +43,10 @@ Technical entities (not counted as domain entities): **User**, **Role** — used
 - Create / edit / delete a **League**
 - Create / edit / delete a **Team** (with league selection)
 - Create / edit / delete a **Player** (with team selection)
-- Create / edit / delete a **Match** (with home/away team selection, score and date/time)
+- Create / edit / delete a **Match** (home/away team selection and date/time)
+- Record / edit / delete a **Goal** within a match (scorer, optional assist, minute 1–40); the half
+  is derived automatically from the minute (1–20 → 1st half, 21–40 → 2nd half) and the match score
+  is recalculated automatically after every goal change
 
 Each functionality is triggered through a form/button in the UI, invokes a backend endpoint, and
 shows a visible result (redirect to the updated list).

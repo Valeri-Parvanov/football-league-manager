@@ -121,7 +121,7 @@
 
         <!-- Admin actions -->
         <div class="match-actions" sec:authorize="hasRole('ADMIN')">
-            <a th:href="@{/matches/{id}/goals/add(id=${match.id})}" class="btn-goal">+ Goal</a>
+            <a th:href="@{/matches/{id}/goals/new(id=${match.id})}" class="btn-goal">+ Goal</a>
             <a th:href="@{/matches/{id}/edit(id=${match.id})}" class="btn-edit">Edit</a>
             <form th:action="@{/matches/{id}/delete(id=${match.id})}" method="post" style="display:inline">
                 <button type="submit" class="btn-del">Delete</button>

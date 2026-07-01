@@ -59,7 +59,7 @@ public class LeagueController {
         return "leagues/form";
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public String create(@Valid @ModelAttribute("leagueDto") LeagueDto leagueDto, BindingResult bindingResult,
                           Authentication authentication, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {

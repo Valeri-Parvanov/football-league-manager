@@ -14,8 +14,6 @@ public interface MatchService {
 
     List<MatchDto> findAll(Sort sort);
 
-    List<MatchDto> findAllByTeam(UUID teamId);
-
     MatchDto findById(UUID id);
 
     MatchDto create(MatchDto matchDto);

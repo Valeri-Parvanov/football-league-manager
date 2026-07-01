@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/my-proposals")
+@RequestMapping("/my-change-requests")
 public class MyChangeRequestController {
 
     private final ChangeRequestService changeRequestService;
@@ -18,6 +18,6 @@ public class MyChangeRequestController {
     @GetMapping
     public String myProposals(Authentication authentication, Model model) {
         model.addAttribute("changeRequests", changeRequestService.findMine(authentication));
-        return "my-proposals";
+        return "my-change-requests";
     }
 }

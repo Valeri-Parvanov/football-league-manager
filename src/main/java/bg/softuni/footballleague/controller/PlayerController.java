@@ -66,7 +66,7 @@ public class PlayerController {
         return "players/form";
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public String create(@Valid @ModelAttribute("playerDto") PlayerDto playerDto, BindingResult bindingResult,
                           Model model, Authentication authentication, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {

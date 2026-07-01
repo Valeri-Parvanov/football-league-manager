@@ -63,7 +63,7 @@ public class TeamController {
         return "teams/form";
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public String create(@Valid @ModelAttribute("teamDto") TeamDto teamDto, BindingResult bindingResult,
                           Model model, Authentication authentication, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
