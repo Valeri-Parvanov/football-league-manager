@@ -1,16 +1,20 @@
 package bg.softuni.footballleague.controller;
 
+import bg.softuni.footballleague.dto.GoalDto;
+import bg.softuni.footballleague.dto.GoalEventDto;
 import bg.softuni.footballleague.dto.MatchDto;
 import bg.softuni.footballleague.dto.TeamDto;
 import bg.softuni.footballleague.model.ChangeAction;
 import bg.softuni.footballleague.model.EntityType;
 import bg.softuni.footballleague.service.ChangeRequestService;
 import bg.softuni.footballleague.service.MatchService;
+import bg.softuni.footballleague.service.PlayerService;
 import bg.softuni.footballleague.service.TeamService;
 import bg.softuni.footballleague.web.SortSupport;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,6 +46,7 @@ public class MatchController {
 
     private final MatchService matchService;
     private final TeamService teamService;
+    private final PlayerService playerService;
     private final ChangeRequestService changeRequestService;
 
     @GetMapping
@@ -118,6 +123,85 @@ public class MatchController {
                 EntityType.MATCH, ChangeAction.DELETE, null, id, authentication);
         redirectAttributes.addFlashAttribute("statusMessage",
                 executed ? "Match deleted." : "Submitted for admin approval.");
+        return "redirect:/matches";
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}/goals/add")
+    public String addGoalForm(@PathVariable UUID id, Model model) {
+        MatchDto match = matchService.findById(id);
+        model.addAttribute("match", match);
+        model.addAttribute("homePlayers", playerService.findAllByTeam(match.getHomeTeamId()));
+        model.addAttribute("awayPlayers", playerService.findAllByTeam(match.getAwayTeamId()));
+        model.addAttribute("goalEventDto", new GoalEventDto());
+        return "matches/goals/add";
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/goals/add")
+    public String addGoal(@PathVariable UUID id,
+                          @Valid @ModelAttribute("goalEventDto") GoalEventDto goalEventDto,
+                          BindingResult bindingResult, Model model,
+                          RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            MatchDto match = matchService.findById(id);
+            model.addAttribute("match", match);
+            model.addAttribute("homePlayers", playerService.findAllByTeam(match.getHomeTeamId()));
+            model.addAttribute("awayPlayers", playerService.findAllByTeam(match.getAwayTeamId()));
+            return "matches/goals/add";
+        }
+        matchService.addGoal(id, goalEventDto);
+        redirectAttributes.addFlashAttribute("statusMessage", "Goal recorded.");
+        return "redirect:/matches";
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}/goals/{goalId}/edit")
+    public String editGoalForm(@PathVariable UUID id, @PathVariable UUID goalId, Model model) {
+        MatchDto match = matchService.findById(id);
+        GoalDto goal = matchService.findGoalById(goalId);
+
+        GoalEventDto form = new GoalEventDto();
+        form.setScorerId(goal.getScorerId());
+        form.setAssistantId(goal.getAssistantId());
+        if (goal.getMinute() != null) {
+            int fullMinute = goal.getHalf().name().equals("SECOND") ? goal.getMinute() + 20 : goal.getMinute();
+            form.setMinute(fullMinute);
+        }
+
+        model.addAttribute("match", match);
+        model.addAttribute("goalId", goalId);
+        model.addAttribute("homePlayers", playerService.findAllByTeam(match.getHomeTeamId()));
+        model.addAttribute("awayPlayers", playerService.findAllByTeam(match.getAwayTeamId()));
+        model.addAttribute("goalEventDto", form);
+        return "matches/goals/edit";
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/goals/{goalId}/edit")
+    public String editGoal(@PathVariable UUID id, @PathVariable UUID goalId,
+                           @Valid @ModelAttribute("goalEventDto") GoalEventDto goalEventDto,
+                           BindingResult bindingResult, Model model,
+                           RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            MatchDto match = matchService.findById(id);
+            model.addAttribute("match", match);
+            model.addAttribute("goalId", goalId);
+            model.addAttribute("homePlayers", playerService.findAllByTeam(match.getHomeTeamId()));
+            model.addAttribute("awayPlayers", playerService.findAllByTeam(match.getAwayTeamId()));
+            return "matches/goals/edit";
+        }
+        matchService.updateGoal(goalId, goalEventDto);
+        redirectAttributes.addFlashAttribute("statusMessage", "Goal updated.");
+        return "redirect:/matches";
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/goals/{goalId}/delete")
+    public String deleteGoal(@PathVariable UUID id, @PathVariable UUID goalId,
+                             RedirectAttributes redirectAttributes) {
+        matchService.deleteGoal(goalId);
+        redirectAttributes.addFlashAttribute("statusMessage", "Goal removed.");
         return "redirect:/matches";
     }
 

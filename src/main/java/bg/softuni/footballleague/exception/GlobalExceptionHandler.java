@@ -1,6 +1,8 @@
 package bg.softuni.footballleague.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -8,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(StaleSessionException.class)
     public String handleStaleSession(HttpServletRequest request) {
@@ -39,6 +43,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateShirtNumberException.class)
     public String handleDuplicateShirtNumber(DuplicateShirtNumberException ex, Model model) {
         model.addAttribute("errorMessage", ex.getMessage());
+        return "error";
+    }
+
+    @ExceptionHandler(InvalidGoalException.class)
+    public String handleInvalidGoal(InvalidGoalException ex, Model model) {
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "error";
+    }
+
+    @ExceptionHandler(Exception.class)
+    public String handleGeneric(Exception ex, Model model) {
+        log.error("Unhandled exception", ex);
+        model.addAttribute("errorMessage", ex.getMessage() != null
+                ? ex.getMessage()
+                : ex.getClass().getSimpleName());
         return "error";
     }
 }

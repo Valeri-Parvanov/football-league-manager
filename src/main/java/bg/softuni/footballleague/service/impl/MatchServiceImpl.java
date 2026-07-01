@@ -1,11 +1,19 @@
 package bg.softuni.footballleague.service.impl;
 
+import bg.softuni.footballleague.dto.GoalDto;
+import bg.softuni.footballleague.dto.GoalEventDto;
 import bg.softuni.footballleague.dto.MatchDto;
 import bg.softuni.footballleague.exception.EntityNotFoundException;
+import bg.softuni.footballleague.exception.InvalidGoalException;
 import bg.softuni.footballleague.exception.InvalidMatchException;
+import bg.softuni.footballleague.model.Goal;
+import bg.softuni.footballleague.model.Half;
 import bg.softuni.footballleague.model.Match;
+import bg.softuni.footballleague.model.Player;
 import bg.softuni.footballleague.model.Team;
+import bg.softuni.footballleague.repository.GoalRepository;
 import bg.softuni.footballleague.repository.MatchRepository;
+import bg.softuni.footballleague.repository.PlayerRepository;
 import bg.softuni.footballleague.repository.TeamRepository;
 import bg.softuni.footballleague.service.MatchService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +31,8 @@ public class MatchServiceImpl implements MatchService {
 
     private final MatchRepository matchRepository;
     private final TeamRepository teamRepository;
+    private final GoalRepository goalRepository;
+    private final PlayerRepository playerRepository;
 
     @Override
     public List<MatchDto> findAll() {
@@ -68,6 +78,82 @@ public class MatchServiceImpl implements MatchService {
         matchRepository.delete(getMatchOrThrow(id));
     }
 
+    @Override
+    public void addGoal(UUID matchId, GoalEventDto dto) {
+        Match match = getMatchOrThrow(matchId);
+        Player scorer = getPlayerOrThrow(dto.getScorerId());
+
+        UUID scorerTeamId = scorer.getTeam().getId();
+        boolean scorerBelongsToMatch = scorerTeamId.equals(match.getHomeTeam().getId())
+                || scorerTeamId.equals(match.getAwayTeam().getId());
+        if (!scorerBelongsToMatch) {
+            throw new InvalidGoalException(
+                    "Scorer " + scorer.getFirstName() + " " + scorer.getLastName()
+                    + " does not play in this match.");
+        }
+
+        Goal goal = new Goal();
+        Integer rawMinute = dto.getMinute();
+        Half half = (rawMinute == null || rawMinute <= 20) ? Half.FIRST : Half.SECOND;
+        Integer halfMinute = (rawMinute != null && rawMinute > 20) ? rawMinute - 20 : rawMinute;
+
+        goal.setMatch(match);
+        goal.setScorer(scorer);
+        goal.setHalf(half);
+        goal.setMinute(halfMinute);
+
+        if (dto.getAssistantId() != null) {
+            goal.setAssistant(getPlayerOrThrow(dto.getAssistantId()));
+        }
+
+        goalRepository.save(goal);
+    }
+
+    @Override
+    public GoalDto findGoalById(UUID goalId) {
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new EntityNotFoundException("Goal not found"));
+        return toGoalDto(goal);
+    }
+
+    @Override
+    public void updateGoal(UUID goalId, GoalEventDto dto) {
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new EntityNotFoundException("Goal not found"));
+
+        Player scorer = getPlayerOrThrow(dto.getScorerId());
+
+        UUID scorerTeamId = scorer.getTeam().getId();
+        boolean scorerBelongsToMatch = scorerTeamId.equals(goal.getMatch().getHomeTeam().getId())
+                || scorerTeamId.equals(goal.getMatch().getAwayTeam().getId());
+        if (!scorerBelongsToMatch) {
+            throw new InvalidGoalException(
+                    "Scorer " + scorer.getFirstName() + " " + scorer.getLastName()
+                    + " does not play in this match.");
+        }
+
+        Integer rawMinute = dto.getMinute();
+        Half half = (rawMinute == null || rawMinute <= 20) ? Half.FIRST : Half.SECOND;
+        Integer halfMinute = (rawMinute != null && rawMinute > 20) ? rawMinute - 20 : rawMinute;
+
+        goal.setScorer(scorer);
+        goal.setHalf(half);
+        goal.setMinute(halfMinute);
+        goal.setAssistant(dto.getAssistantId() != null ? getPlayerOrThrow(dto.getAssistantId()) : null);
+
+        goalRepository.save(goal);
+    }
+
+    @Override
+    public void deleteGoal(UUID goalId) {
+        goalRepository.findById(goalId).ifPresent(goalRepository::delete);
+    }
+
+    private Player getPlayerOrThrow(UUID id) {
+        return playerRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Player with id %s not found".formatted(id)));
+    }
+
     private Match getMatchOrThrow(UUID id) {
         return matchRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Match with id %s not found".formatted(id)));
@@ -93,17 +179,60 @@ public class MatchServiceImpl implements MatchService {
     private MatchDto toDto(Match match) {
         MatchDto matchDto = new MatchDto();
         matchDto.setId(match.getId());
+
+        UUID homeTeamId = null;
+        UUID awayTeamId = null;
         if (match.getHomeTeam() != null) {
-            matchDto.setHomeTeamId(match.getHomeTeam().getId());
+            homeTeamId = match.getHomeTeam().getId();
+            matchDto.setHomeTeamId(homeTeamId);
             matchDto.setHomeTeamName(match.getHomeTeam().getName());
         }
         if (match.getAwayTeam() != null) {
-            matchDto.setAwayTeamId(match.getAwayTeam().getId());
+            awayTeamId = match.getAwayTeam().getId();
+            matchDto.setAwayTeamId(awayTeamId);
             matchDto.setAwayTeamName(match.getAwayTeam().getName());
         }
         matchDto.setHomeScore(match.getHomeScore());
         matchDto.setAwayScore(match.getAwayScore());
         matchDto.setPlayedAt(match.getPlayedAt());
+
+        List<Goal> goals = goalRepository.findAllByMatchOrderByHalfAscMinuteAsc(match);
+        int homeHalf = 0, awayHalf = 0;
+        for (Goal g : goals) {
+            GoalDto dto = toGoalDto(g);
+            boolean isHome = dto.getTeamId() != null && dto.getTeamId().equals(homeTeamId);
+            boolean isFirst = g.getHalf() == Half.FIRST;
+
+            if (isFirst) {
+                if (isHome) { matchDto.getFirstHalfHomeGoals().add(dto); homeHalf++; }
+                else        { matchDto.getFirstHalfAwayGoals().add(dto); awayHalf++; }
+            } else {
+                if (isHome) matchDto.getSecondHalfHomeGoals().add(dto);
+                else        matchDto.getSecondHalfAwayGoals().add(dto);
+            }
+        }
+        if (!goals.isEmpty()) {
+            matchDto.setHomeHalfScore(homeHalf);
+            matchDto.setAwayHalfScore(awayHalf);
+        }
+
         return matchDto;
+    }
+
+    private GoalDto toGoalDto(Goal goal) {
+        GoalDto dto = new GoalDto();
+        dto.setId(goal.getId());
+        dto.setHalf(goal.getHalf());
+        dto.setMinute(goal.getMinute());
+        if (goal.getScorer() != null) {
+            dto.setScorerId(goal.getScorer().getId());
+            dto.setScorerName(goal.getScorer().getFirstName() + " " + goal.getScorer().getLastName());
+            dto.setTeamId(goal.getScorer().getTeam().getId());
+        }
+        if (goal.getAssistant() != null) {
+            dto.setAssistantId(goal.getAssistant().getId());
+            dto.setAssistantName(goal.getAssistant().getFirstName() + " " + goal.getAssistant().getLastName());
+        }
+        return dto;
     }
 }

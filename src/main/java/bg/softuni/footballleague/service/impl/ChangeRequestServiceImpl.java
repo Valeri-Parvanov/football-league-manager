@@ -222,7 +222,6 @@ public class ChangeRequestServiceImpl implements ChangeRequestService {
                 }
             }
             case LEAGUE -> {
-                // no related-entity name to enrich
             }
         }
     }

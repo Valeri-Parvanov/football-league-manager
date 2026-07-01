@@ -1,5 +1,7 @@
 package bg.softuni.footballleague.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -7,6 +9,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -31,7 +36,27 @@ public class MatchDto {
     @PastOrPresent(message = "Match date/time cannot be in the future")
     private LocalDateTime playedAt;
 
+    @JsonIgnore
+    @AssertTrue(message = "Matches must be scheduled between 08:00 and 23:30, on the hour or half hour")
+    public boolean isPlayedAtTimeValid() {
+        if (playedAt == null) return true;
+        LocalTime t = playedAt.toLocalTime();
+        int minute = t.getMinute();
+        return !t.isBefore(LocalTime.of(8, 0))
+                && !t.isAfter(LocalTime.of(23, 30))
+                && (minute == 0 || minute == 30);
+    }
+
     private String homeTeamName;
 
     private String awayTeamName;
+
+    private Integer homeHalfScore;
+
+    private Integer awayHalfScore;
+
+    private List<GoalDto> firstHalfHomeGoals = new ArrayList<>();
+    private List<GoalDto> firstHalfAwayGoals = new ArrayList<>();
+    private List<GoalDto> secondHalfHomeGoals = new ArrayList<>();
+    private List<GoalDto> secondHalfAwayGoals = new ArrayList<>();
 }

@@ -1,5 +1,7 @@
 package bg.softuni.footballleague.service;
 
+import bg.softuni.footballleague.dto.GoalDto;
+import bg.softuni.footballleague.dto.GoalEventDto;
 import bg.softuni.footballleague.dto.MatchDto;
 import org.springframework.data.domain.Sort;
 
@@ -21,4 +23,12 @@ public interface MatchService {
     MatchDto update(UUID id, MatchDto matchDto);
 
     void delete(UUID id);
+
+    GoalDto findGoalById(UUID goalId);
+
+    void addGoal(UUID matchId, GoalEventDto dto);
+
+    void updateGoal(UUID goalId, GoalEventDto dto);
+
+    void deleteGoal(UUID goalId);
 }

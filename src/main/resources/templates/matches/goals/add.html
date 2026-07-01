@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Goal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/topbar :: topbar}"></div>
+
+<main class="page">
+<h1>&#9917; Record Goal</h1>
+
+<div class="goal-match-banner">
+    <span class="goal-team" th:text="${match.homeTeamName}"></span>
+    <span class="goal-score" th:text="${match.homeScore} + ' : ' + ${match.awayScore}"></span>
+    <span class="goal-team" th:text="${match.awayTeamName}"></span>
+</div>
+
+<form th:action="@{/matches/{id}/goals/add(id=${match.id})}"
+      th:object="${goalEventDto}" method="post" class="card-form">
+
+    <div>
+        <label for="minute">Minute <span class="field-hint" style="display:inline">(optional, 1–40)</span></label>
+        <input type="number" id="minute" th:field="*{minute}" min="1" max="40" placeholder="e.g. 25"/>
+        <span style="color:red" th:if="${#fields.hasErrors('minute')}" th:errors="*{minute}"></span>
+    </div>
+
+    <div>
+        <label for="scorerId">Scorer</label>
+        <select id="scorerId" th:field="*{scorerId}">
+            <option value="">-- select scorer --</option>
+            <optgroup th:label="${match.homeTeamName}">
+                <option th:each="p : ${homePlayers}"
+                        th:value="${p.id}"
+                        th:text="${p.shirtNumber} + '. ' + ${p.firstName} + ' ' + ${p.lastName}"></option>
+            </optgroup>
+            <optgroup th:label="${match.awayTeamName}">
+                <option th:each="p : ${awayPlayers}"
+                        th:value="${p.id}"
+                        th:text="${p.shirtNumber} + '. ' + ${p.firstName} + ' ' + ${p.lastName}"></option>
+            </optgroup>
+        </select>
+        <span style="color:red" th:if="${#fields.hasErrors('scorerId')}" th:errors="*{scorerId}"></span>
+    </div>
+
+    <div>
+        <label for="assistantId">Assist <span class="field-hint" style="display:inline">(optional)</span></label>
+        <select id="assistantId" th:field="*{assistantId}">
+            <option value="">-- no assist --</option>
+            <optgroup th:label="${match.homeTeamName}">
+                <option th:each="p : ${homePlayers}"
+                        th:value="${p.id}"
+                        th:text="${p.shirtNumber} + '. ' + ${p.firstName} + ' ' + ${p.lastName}"></option>
+            </optgroup>
+            <optgroup th:label="${match.awayTeamName}">
+                <option th:each="p : ${awayPlayers}"
+                        th:value="${p.id}"
+                        th:text="${p.shirtNumber} + '. ' + ${p.firstName} + ' ' + ${p.lastName}"></option>
+            </optgroup>
+        </select>
+    </div>
+
+    <button type="submit">Save Goal</button>
+</form>
+
+<p><a th:href="@{/matches}" class="back-link">&#8592; Back to matches</a></p>
+</main>
+</body>
+</html>
