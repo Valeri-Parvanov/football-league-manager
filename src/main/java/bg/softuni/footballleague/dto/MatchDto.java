@@ -1,6 +1,7 @@
 package bg.softuni.footballleague.dto;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +28,7 @@ public class MatchDto {
     private Integer awayScore;
 
     @NotNull(message = "Please select a date and time")
+    @PastOrPresent(message = "Match date/time cannot be in the future")
     private LocalDateTime playedAt;
 
     private String homeTeamName;

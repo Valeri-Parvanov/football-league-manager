@@ -1,7 +1,7 @@
 package bg.softuni.footballleague.service.impl;
 
 import bg.softuni.footballleague.dto.RegisterDto;
-import bg.softuni.footballleague.exception.EntityNotFoundException;
+import bg.softuni.footballleague.exception.StaleSessionException;
 import bg.softuni.footballleague.exception.UsernameAlreadyExistsException;
 import bg.softuni.footballleague.model.Role;
 import bg.softuni.footballleague.model.User;
@@ -37,6 +37,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User %s not found".formatted(username)));
+                .orElseThrow(() -> new StaleSessionException(
+                        "Your session refers to a user (%s) that no longer exists".formatted(username)));
     }
 }

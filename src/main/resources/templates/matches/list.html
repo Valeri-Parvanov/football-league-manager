@@ -3,6 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Matches</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -17,10 +18,11 @@
 
 <p th:if="${statusMessage}" th:text="${statusMessage}" class="status-message"></p>
 
-<div sec:authorize="isAuthenticated()">
-    <a th:href="@{/matches/create}">Add new match</a>
+<div class="add-new-bar" sec:authorize="isAuthenticated()">
+    <a th:href="@{/matches/create}" class="btn-add">Add new match</a>
 </div>
 
+<div class="table-wrapper">
 <table border="1" cellpadding="6">
     <thead>
     <tr>
@@ -28,7 +30,7 @@
         <th th:replace="~{fragments/sortable :: sortTh('/matches', 'awayTeam', 'Away team')}"></th>
         <th th:replace="~{fragments/sortable :: sortTh('/matches', 'homeScore', 'Score')}"></th>
         <th th:replace="~{fragments/sortable :: sortTh('/matches', 'playedAt', 'Played at')}"></th>
-        <th sec:authorize="isAuthenticated()">Actions</th>
+        <th sec:authorize="hasRole('ADMIN')">Actions</th>
     </tr>
     </thead>
     <tbody>
@@ -37,7 +39,7 @@
         <td th:text="${match.awayTeamName}"></td>
         <td th:text="${match.homeScore} + ' : ' + ${match.awayScore}"></td>
         <td th:text="${match.playedAt}"></td>
-        <td sec:authorize="isAuthenticated()">
+        <td sec:authorize="hasRole('ADMIN')">
             <a th:href="@{/matches/{id}/edit(id=${match.id})}">Edit</a>
             <form th:action="@{/matches/{id}/delete(id=${match.id})}" method="post" style="display:inline">
                 <button type="submit">Delete</button>
@@ -46,6 +48,7 @@
     </tr>
     </tbody>
 </table>
+</div>
 </main>
 </body>
 </html>

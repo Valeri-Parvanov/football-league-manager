@@ -3,11 +3,15 @@ package bg.softuni.footballleague.service.impl;
 import bg.softuni.footballleague.dto.LeagueDto;
 import bg.softuni.footballleague.exception.EntityNotFoundException;
 import bg.softuni.footballleague.model.League;
+import bg.softuni.footballleague.model.Match;
+import bg.softuni.footballleague.model.Team;
 import bg.softuni.footballleague.repository.LeagueRepository;
+import bg.softuni.footballleague.repository.MatchRepository;
 import bg.softuni.footballleague.service.LeagueService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +23,7 @@ public class LeagueServiceImpl implements LeagueService {
     private static final Sort DEFAULT_SORT = Sort.by("name");
 
     private final LeagueRepository leagueRepository;
+    private final MatchRepository matchRepository;
 
     @Override
     public List<LeagueDto> findAll() {
@@ -52,8 +57,14 @@ public class LeagueServiceImpl implements LeagueService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID id) {
-        leagueRepository.delete(getLeagueOrThrow(id));
+        League league = getLeagueOrThrow(id);
+        for (Team team : league.getTeams()) {
+            List<Match> matches = matchRepository.findAllByHomeTeamOrAwayTeam(team, team);
+            matchRepository.deleteAll(matches);
+        }
+        leagueRepository.delete(league);
     }
 
     private League getLeagueOrThrow(UUID id) {

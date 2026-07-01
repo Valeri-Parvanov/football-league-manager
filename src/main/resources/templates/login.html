@@ -2,6 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Football League Manager</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -15,6 +16,7 @@
 <h1>Login</h1>
 
 <p th:if="${statusMessage}" th:text="${statusMessage}" class="status-message"></p>
+<p th:if="${param.expired}" class="error-message">Your session has expired. Please log in again.</p>
 <p style="color:red" th:if="${param.error}">Invalid username or password</p>
 
 <form th:action="@{/login}" method="post" class="card-form">

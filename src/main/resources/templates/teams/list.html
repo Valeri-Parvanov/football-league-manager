@@ -3,6 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teams</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -17,17 +18,18 @@
 
 <p th:if="${statusMessage}" th:text="${statusMessage}" class="status-message"></p>
 
-<div sec:authorize="isAuthenticated()">
-    <a th:href="@{/teams/create}">Add new team</a>
+<div class="add-new-bar" sec:authorize="isAuthenticated()">
+    <a th:href="@{/teams/create}" class="btn-add">Add new team</a>
 </div>
 
+<div class="table-wrapper">
 <table border="1" cellpadding="6">
     <thead>
     <tr>
         <th th:replace="~{fragments/sortable :: sortTh('/teams', 'name', 'Name')}"></th>
         <th th:replace="~{fragments/sortable :: sortTh('/teams', 'city', 'City')}"></th>
         <th th:replace="~{fragments/sortable :: sortTh('/teams', 'league', 'League')}"></th>
-        <th sec:authorize="isAuthenticated()">Actions</th>
+        <th sec:authorize="hasRole('ADMIN')">Actions</th>
     </tr>
     </thead>
     <tbody>
@@ -35,7 +37,7 @@
         <td th:text="${team.name}"></td>
         <td th:text="${team.city}"></td>
         <td th:text="${team.leagueName}"></td>
-        <td sec:authorize="isAuthenticated()">
+        <td sec:authorize="hasRole('ADMIN')">
             <a th:href="@{/teams/{id}/edit(id=${team.id})}">Edit</a>
             <form th:action="@{/teams/{id}/delete(id=${team.id})}" method="post" style="display:inline">
                 <button type="submit">Delete</button>
@@ -44,6 +46,7 @@
     </tr>
     </tbody>
 </table>
+</div>
 </main>
 </body>
 </html>
