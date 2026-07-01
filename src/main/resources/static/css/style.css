@@ -1,4 +1,4 @@
-:root {
+﻿:root {
     --bg-deep: #06140d;
     --bg-mid: #0c2a1a;
     --pitch: #16a34a;
@@ -28,14 +28,14 @@ body {
     color: var(--paper);
     background-color: #07260f;
     background-image:
-        /* cool stadium floodlight glow, top corners only */
+        
         radial-gradient(circle at 4% 0%, rgba(214, 234, 255, 0.16), transparent 26%),
         radial-gradient(circle at 96% 0%, rgba(214, 234, 255, 0.13), transparent 26%),
-        /* vignette for depth/realism */
+        
         radial-gradient(ellipse 90% 70% at 50% 28%, transparent 45%, rgba(0, 0, 0, 0.55) 100%),
-        /* full pitch line markings (halfway line, center circle, penalty boxes, arcs, corners) */
+        
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 1000'%3E%3Cg fill='none' stroke='white' stroke-opacity='0.16' stroke-width='3'%3E%3Crect x='40' y='40' width='520' height='920'/%3E%3Cline x1='40' y1='500' x2='560' y2='500'/%3E%3Ccircle cx='300' cy='500' r='95'/%3E%3Ccircle cx='300' cy='500' r='4' fill='white' fill-opacity='0.16' stroke='none'/%3E%3Crect x='170' y='40' width='260' height='160'/%3E%3Crect x='240' y='40' width='120' height='60'/%3E%3Cpath d='M 215 200 A 95 95 0 0 1 385 200'/%3E%3Ccircle cx='300' cy='150' r='3.5' fill='white' fill-opacity='0.16' stroke='none'/%3E%3Crect x='170' y='800' width='260' height='160'/%3E%3Crect x='240' y='900' width='120' height='60'/%3E%3Cpath d='M 385 800 A 95 95 0 0 1 215 800'/%3E%3Ccircle cx='300' cy='850' r='3.5' fill='white' fill-opacity='0.16' stroke='none'/%3E%3Cpath d='M 40 60 A 20 20 0 0 1 60 40'/%3E%3Cpath d='M 540 40 A 20 20 0 0 1 560 60'/%3E%3Cpath d='M 560 940 A 20 20 0 0 1 540 960'/%3E%3Cpath d='M 60 960 A 20 20 0 0 1 40 940'/%3E%3C/g%3E%3C/svg%3E"),
-        /* mowed-grass stripes */
+        
         repeating-linear-gradient(
             0deg,
             rgba(255, 255, 255, 0.045) 0,
@@ -52,7 +52,6 @@ body {
     position: relative;
 }
 
-/* stadium stands silhouette along the very top, fading into the pitch */
 body::before {
     content: "";
     position: fixed;
@@ -73,7 +72,6 @@ body::before {
     mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
 }
 
-/* a faint, darkened decorative ball, purely cosmetic */
 body::after {
     content: "\26BD";
     position: fixed;
@@ -89,8 +87,6 @@ body::after {
 h1, h2, h3 {
     font-family: "Poppins", "Inter", sans-serif;
 }
-
-/* ---------- Top bar ---------- */
 
 .topbar {
     position: sticky;
@@ -155,8 +151,6 @@ h1, h2, h3 {
     color: var(--gold-bright);
 }
 
-/* ---------- Links & buttons ---------- */
-
 a {
     color: var(--pitch-bright);
     text-decoration: none;
@@ -219,8 +213,6 @@ td form button:hover {
     box-shadow: 0 8px 20px rgba(244, 63, 94, 0.5);
 }
 
-/* ---------- Page card ---------- */
-
 .page {
     position: relative;
     z-index: 2;
@@ -263,8 +255,6 @@ td form button:hover {
     background: var(--gold);
 }
 
-/* ---------- Nav pills ---------- */
-
 nav {
     display: flex;
     gap: 0.5rem;
@@ -287,35 +277,36 @@ nav a:hover {
     transform: translateY(-1px);
 }
 
-/* ---------- Admin add-new link ---------- */
-
-.page > div[sec\:authorize] {
+.add-new-bar {
     margin-bottom: 1.4rem;
 }
 
-.page > div[sec\:authorize] > a {
+.btn-add {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
     background: linear-gradient(135deg, var(--pitch-bright), var(--pitch));
     color: var(--paper);
-    padding: 0.55rem 1.3rem;
+    padding: 0.65rem 1.5rem;
     border-radius: 999px;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 700;
     box-shadow: 0 6px 18px rgba(22, 163, 74, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, background 0.15s ease;
 }
 
-.page > div[sec\:authorize] > a::before {
+.btn-add::before {
     content: "+";
     font-weight: 800;
+    font-size: 1.1rem;
 }
 
-.page > div[sec\:authorize] > a:hover {
+.btn-add:hover {
     color: var(--ink);
     background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 26px rgba(251, 191, 36, 0.5);
 }
-
-/* ---------- Tables (card-row style) ---------- */
 
 table {
     width: 100%;
@@ -406,8 +397,6 @@ td a {
     border-radius: var(--radius-md);
     margin-bottom: 1rem;
 }
-
-/* ---------- Pending changes ---------- */
 
 .cr-list {
     display: flex;
@@ -526,8 +515,6 @@ a.btn-reject {
     background: linear-gradient(135deg, var(--danger), var(--danger-dark));
 }
 
-/* ---------- Forms ---------- */
-
 .card-form {
     max-width: 460px;
     background: linear-gradient(180deg, #ffffff, #f3faf5);
@@ -596,8 +583,145 @@ span[style*="color: red"] {
     color: var(--danger-dark) !important;
 }
 
-/* ---------- Error page ---------- */
-
 .page p {
     color: var(--muted-ink, #3a4f44);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+
+    
+    .topbar {
+        padding: 0.8rem 1.2rem;
+        gap: 0.6rem;
+    }
+
+    .brand {
+        font-size: 1.15rem;
+    }
+
+    nav {
+        width: 100%;
+        gap: 0.35rem;
+    }
+
+    nav a {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.82rem;
+    }
+
+    .auth-box {
+        width: 100%;
+        justify-content: flex-end;
+        gap: 0.6rem;
+    }
+
+    
+    .page {
+        margin: 1rem 0.75rem 0;
+        padding: 1.4rem 1.2rem;
+        border-radius: var(--radius-md);
+    }
+
+    .page h1 {
+        font-size: 1.45rem;
+    }
+
+    
+    .card-form {
+        max-width: 100%;
+        padding: 1.3rem 1.1rem;
+    }
+
+    
+    .cr-reject-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cr-reason-input {
+        width: 100%;
+    }
+
+    
+    .cr-list {
+        max-width: 100%;
+    }
+
+    .cr-card-header {
+        gap: 0.4rem;
+    }
+
+    .cr-meta {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 0.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+    
+    .topbar {
+        padding: 0.65rem 0.9rem;
+    }
+
+    nav a {
+        padding: 0.35rem 0.65rem;
+        font-size: 0.78rem;
+    }
+
+    
+    .page {
+        margin: 0.6rem 0.4rem 0;
+        padding: 1rem 0.85rem;
+    }
+
+    .page h1 {
+        font-size: 1.25rem;
+    }
+
+    
+    .btn-add {
+        font-size: 0.85rem;
+        padding: 0.55rem 1.1rem;
+    }
+
+    
+    td, th {
+        padding: 0.65rem 0.7rem;
+        font-size: 0.85rem;
+    }
+
+    
+    .cr-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-approve,
+    .btn-reject {
+        text-align: center;
+        width: 100%;
+    }
+
+    
+    .card-form {
+        padding: 1rem 0.9rem;
+    }
+
+    input,
+    select {
+        font-size: 0.9rem;
+    }
+
+    
+    body::after {
+        display: none;
+    }
 }
